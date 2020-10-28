@@ -1,0 +1,51 @@
+FROM ubuntu:18.04
+ 
+ENV DEBIAN_FRONTEND=noninteractive
+ 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        curl \
+        git \
+        libfreetype6-dev \
+        libhdf5-serial-dev \
+        libpng-dev \
+        libzmq3-dev \
+        pkg-config \
+        rsync \
+        software-properties-common \
+        unzip \
+        zip \
+        zlib1g-dev \
+        wget \
+        && \
+    rm -rf /var/lib/apt/lists/*
+
+# ================================================
+# ================ Install Anaconda ==============
+# ================================================
+ENV PATH="/root/miniconda3/bin:${PATH}"
+ARG PATH="/root/miniconda3/bin:${PATH}"
+RUN apt-get update
+
+RUN wget \
+    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && mkdir /root/.conda \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b \
+    && rm -f Miniconda3-latest-Linux-x86_64.sh
+
+ENV PATH="/root/miniconda3/bin:${PATH}"
+ARG PATH="/root/miniconda3/bin:${PATH}"
+RUN apt-get update
+
+COPY environment.yml .
+RUN conda env create -f environment.yml
+
+SHELL ["conda", "run", "-n", "geocomp", "/bin/bash", "-c"]
+SHELL ["conda", "install", "-c", "conda-forge", "scikit-geometry"]
+
+WORKDIR /workspace
+
+# Execute
+# docker run --rm -it -p 8080:8080 -v $PWD:/workspace geocomp:latest bash
+# source activate geocomp
+# jupyter notebook --allow-root --ip=0.0.0.0 --port 8080

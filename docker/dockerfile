@@ -46,6 +46,8 @@ SHELL ["conda", "install", "-c", "conda-forge", "scikit-geometry"]
 WORKDIR /workspace
 
 # Execute
+# docker build -t geocomp:latest .
+# cd ..
 # docker run --rm -it -p 8080:8080 -v $PWD:/workspace geocomp:latest bash
 # source activate geocomp
 # jupyter notebook --allow-root --ip=0.0.0.0 --port 8080

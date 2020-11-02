@@ -75,6 +75,19 @@ def mahalanobis(x:Point, data:List[Point], cov: np.ndarray=None):
     mahal = np.dot(left_term, x_minus_mu.T)
     return mahal.diagonal()[0]
 
+def sortPoints(points:List[Point]) -> List[Point]:
+    """Return point_array sorted by leftmost first, then by slope, ascending."""
+
+    def slope(y:Point):
+        """returns the slope of the 2 points."""
+        x = points[0]
+        return (x[1] - y[1]) / (x[0] - y[0])
+
+    points.sort()  # put leftmost first
+    points = points[:1] + sorted(points[1:], key=slope)
+    return points
+
+
 # =============================================================================================
 #                                   CONVEX-HULL ALGORITHMS
 # =============================================================================================
@@ -112,6 +125,29 @@ def giftWrapping(data: List[Point]):
     except Exception as e:
         print('Exception:',repr(e))
         return hull
+
+def grahamAlgorithm(data: List[Point]):
+    """Takes an array of points to be scanned.
+    Returns an array of points that make up the convex hull surrounding the points passed in in point_array.
+    """
+    def crossProdOrientation(a: Point, b: Point, c: Point):
+        """Returns the orientation of the set of points.
+        >0 if x,y,z are clockwise, <0 if counterclockwise, 0 if co-linear.
+        """
+        return (b[1] - a[1]) * (c[0] - a[0]) - (b[0] - a[0]) * (c[1] - a[1])
+    pts_cp = data[:]
+    # convex_hull is a stack of points beginning with the leftmost point.
+    convex_hull = []
+    sorted_points = sortPoints(pts_cp)
+    for p in sorted_points:
+        # if we turn clockwise to reach this point, pop the last point from the stack, else, append this point to it.
+        while len(convex_hull) > 1 and crossProdOrientation(convex_hull[-2], convex_hull[-1], p) >= 0:
+            convex_hull.pop()
+        convex_hull.append(p)
+    # the stack is now a representation of the convex hull, return it.
+    return convex_hull
+
+# https://github.com/samfoy/GrahamScan/blob/master/graham_scan.py
 
 # =============================================================================================
 #                                   DRAW(JUPYTER) ALGORITHMS

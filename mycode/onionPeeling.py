@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Tuple
 from scipy.spatial import distance
-from mycode.utils import Point, mahalanobis, toVector, list_splice, giftWrapping
+from mycode.utils import Point, mahalanobis, toVector, list_splice, giftWrapping, grahamAlgorithm
 
 class OnionPeeling:
     def __init__(self, pts: List[Point]):
@@ -21,6 +21,8 @@ class OnionPeeling:
     def convexHull(self, pts: List[Point], algorithm='gift-wrapping'):
         if algorithm=='gift-wrapping':
             return giftWrapping(pts)
+        elif algorithm=='graham-algorithm':
+            return grahamAlgorithm(pts)
         else:
             return None
 
